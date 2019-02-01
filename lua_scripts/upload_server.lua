@@ -28,8 +28,8 @@ while true do
     if not typ then
          ngx.say("failed to read: ", err)
          if file then
-	     file:close()
-	     file = nil
+             file:close()
+             file = nil
          end
          return
     end
@@ -39,8 +39,8 @@ while true do
             local file_name = helper.find_filename(res)
             if file_name then
                 local path = "/mnt/ceph/download/" .. file_name
-		local dir = getPath(path)
-		local status = os.execute('mkdir -p '..dir)
+                local dir = getPath(path)
+                local status = os.execute('mkdir -p '..dir)
                 if not status then
                     ngx.say(cjson.encode({code=501, msg=status}))
                     return
@@ -50,7 +50,7 @@ while true do
                     ngx.say("failed to open file ", file_name)
                     return
                 else
-                    tmp[file] = file_name 
+                    tmp[file] = file_name
                 end
             end
         end
@@ -64,7 +64,7 @@ while true do
     elseif typ == "part_end" then
         if file then
             local md5_sum = md5:final()
-            local url = "http://172.16.30.25/download/" .. tmp[file]	
+            local url = "http://172.16.30.25/download/" .. tmp[file]
             table.insert(ret, {url=url, md5=str.to_hex(md5_sum)})
             tmp[file] = nil
             file:close()
@@ -74,16 +74,16 @@ while true do
 
     elseif typ == "eof" then
         ngx.say(cjson.encode(ret))
-	if file then
-	    file:close()
+        if file then
+            file:close()
             file = nil
         end
         ret = nil
         break
 
     else
-	if file then
-	    file:close()
+        if file then
+            file:close()
             file = nil
         end
     end
