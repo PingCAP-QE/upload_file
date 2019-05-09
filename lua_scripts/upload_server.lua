@@ -38,7 +38,7 @@ while true do
         if #res == 3 and res[1] == "Content-Disposition" then
             local file_name = helper.find_filename(res)
             if file_name then
-                local path = "/mnt/ceph/download/" .. file_name
+                local path = "/fileserver/download/" .. file_name
 		local dir = getPath(path)
 		local status = os.execute('mkdir -p '..dir)
                 if not status then
@@ -88,3 +88,4 @@ while true do
         end
     end
 end
+
