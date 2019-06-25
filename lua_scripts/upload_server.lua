@@ -64,7 +64,7 @@ while true do
     elseif typ == "part_end" then
         if file then
             local md5_sum = md5:final()
-            local url = "http://172.16.30.25/download/" .. tmp[file]	
+            local url = "http://fileserver.pingcap.net/download/" .. tmp[file]	
             table.insert(ret, {url=url, md5=str.to_hex(md5_sum)})
             tmp[file] = nil
             file:close()
