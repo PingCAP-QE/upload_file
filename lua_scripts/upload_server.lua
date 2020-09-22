@@ -3,6 +3,8 @@ local resty_md5 = require "resty.md5"
 local upload = require "resty.upload"
 local helper = require "helper"
 local cjson = require "cjson"
+local resty_lock = require "lock"
+
 if helper == nil then
     ngx.say("not find helper lib")
     return
@@ -39,18 +41,33 @@ while true do
             local file_name = helper.find_filename(res)
             if file_name then
                 local path = "/fileserver/download/" .. file_name
-		local dir = getPath(path)
-		local status = os.execute('mkdir -p '..dir)
+		        local dir = getPath(path)
+                local status = os.execute('mkdir -p '..dir)
+                
                 if not status then
                     ngx.say(cjson.encode({code=501, msg=status}))
                     return
                 end
+                
+                -- add lock for multi 
+                local lock, err = resty_lock:new(file_name)
+                if not lock then
+                    ngx.say("failed to create lock: ", err)
+                    return
+                end
+
                 file = io.open(path, "w+")
                 if not file then
                     ngx.say("failed to open file ", file_name)
                     return
                 else
                     tmp[file] = file_name 
+                end
+
+                local ok, err = lock:unlock()
+                if not ok then
+                    ngx.say("failed to unlock: ", err)
+                    return
                 end
             end
         end
