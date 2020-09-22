@@ -50,11 +50,13 @@ while true do
                 end
                 
                 -- add lock for multi 
-                local lock, err = resty_lock:new(file_name)
+                local lock, err = resty_lock:new("my_locks")
                 if not lock then
                     ngx.say("failed to create lock: ", err)
                     return
                 end
+
+                local elapsed, err = lock:lock(file_name)
 
                 file = io.open(path, "w+")
                 if not file then
