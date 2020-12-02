@@ -4,7 +4,7 @@ local upload = require "resty.upload"
 local helper = require "helper"
 local cjson = require "cjson"
 local resty_lock = require "lock"
-local uuid = require 'resty.jit-uuid'
+local uuid = require 'jit-uuid'
 
 if helper == nil then
     ngx.say("not find helper lib")
