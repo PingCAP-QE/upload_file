@@ -44,10 +44,10 @@ while true do
             uuid.seed()
             if file_name then
                 local path = "/fileserver/download/" .. file_name
-                local t_path = "/fileserver/tmppath/" .. uuid() 
+                local t_path = "/fileserver/download/tmppath/" .. uuid() 
 		        local dir = getPath(path)
                 local status = os.execute('mkdir -p '..dir)
-                local tmp_status = os.execute('mkdir -p /fileserver/tmppath')
+                local tmp_status = os.execute('mkdir -p /fileserver/download/tmppath')
                 
                 if not status then
                     ngx.say(cjson.encode({code=501, msg=status}))
@@ -91,8 +91,8 @@ while true do
             local md5_sum = md5:final()
             local url = "http://fileserver.pingcap.net/download/" .. tmp[file]	
             table.insert(ret, {url=url, md5=str.to_hex(md5_sum)})
-            tmp[file] = nil
             os.execute("mv " .. tmp_path[file] .. " " .. "/fileserver/download/" .. tmp[file])
+            tmp[file] = nil
             tmp_path[file] = nil
             file:close()
         end
@@ -115,3 +115,4 @@ while true do
         end
     end
 end
+
