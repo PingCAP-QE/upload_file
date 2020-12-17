@@ -19,6 +19,8 @@ if not form then
 end
 local md5 = resty_md5:new()
 local file
+local p
+local d
 local tmp = {}
 local tmp_path = {}
 local ret = {}
@@ -41,7 +43,6 @@ while true do
     if typ == "header" then
         if #res == 3 and res[1] == "Content-Disposition" then
             local file_name = helper.find_filename(res)
-            uuid.seed()
             if file_name then
                 local path = "/fileserver/download/" .. file_name
                 local t_path = "/fileserver/download/tmppath/" .. uuid() 
@@ -90,22 +91,29 @@ while true do
         if file then
             local md5_sum = md5:final()
             local url = "http://fileserver.pingcap.net/download/" .. tmp[file]	
-            table.insert(ret, {url=url, md5=str.to_hex(md5_sum)})
-            os.execute("mv " .. tmp_path[file] .. " " .. "/fileserver/download/" .. tmp[file])
+            table.insert(ret, {url=url, md5=str.to_hex(md5_sum), tmp_path = tmp_path[file]})
+	    p = tmp_path[file]
+            d = tmp[file]
+            file:close()
             tmp[file] = nil
             tmp_path[file] = nil
-            file:close()
         end
         file = nil
         md5:reset()
 
     elseif typ == "eof" then
+        local status, out, err = os.execute("mv " .. p .. " " .. "/fileserver/download/" .. d)
+	-- if status != 0 then
+	    table.insert(ret, {status=status, out=out, err=err, cmd="mv " .. p .. " " .. "/fileserver/download/" .. d})
+        -- fi
         ngx.say(cjson.encode(ret))
 	if file then
 	    file:close()
             file = nil
         end
         ret = nil
+        p = nil
+        d = nil
         break
 
     else
@@ -115,4 +123,3 @@ while true do
         end
     end
 end
-
