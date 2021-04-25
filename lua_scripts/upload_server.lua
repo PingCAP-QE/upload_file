@@ -44,11 +44,11 @@ while true do
         if #res == 3 and res[1] == "Content-Disposition" then
             local file_name = helper.find_filename(res)
             if file_name then
-                local path = "/fileserver/download/" .. file_name
-                local t_path = "/fileserver/download/tmppath/" .. uuid() 
+                local path = "/mnt/fileserver/download/" .. file_name
+                local t_path = "/mnt/fileserver/download/tmppath/" .. uuid() 
 		        local dir = getPath(path)
                 local status = os.execute('mkdir -p '..dir)
-                local tmp_status = os.execute('mkdir -p /fileserver/download/tmppath')
+                local tmp_status = os.execute('mkdir -p /mnt/fileserver/download/tmppath')
                 
                 if not status then
                     ngx.say(cjson.encode({code=501, msg=status}))
@@ -102,9 +102,9 @@ while true do
         md5:reset()
 
     elseif typ == "eof" then
-        local status, out, err = os.execute("mv " .. p .. " " .. "/fileserver/download/" .. d)
+        local status, out, err = os.execute("mv " .. p .. " " .. "/mnt/fileserver/download/" .. d)
 	-- if status != 0 then
-	    table.insert(ret, {status=status, out=out, err=err, cmd="mv " .. p .. " " .. "/fileserver/download/" .. d})
+	    table.insert(ret, {status=status, out=out, err=err, cmd="mv " .. p .. " " .. "/mnt/fileserver/download/" .. d})
         -- fi
         ngx.say(cjson.encode(ret))
 	if file then
